@@ -30,7 +30,7 @@ def extractProductFromArray(row):
 
 
 def extractUnitFromArray(row):
-    pattern = r'(\d+(?:\.\d+)?)\s*([A-Za-zµ]+)'
+    pattern = r'(\d+(?:\.\d+)?)\s*([A-Za-z]+)'
     text = ' '.join(row)
     match = re.search(pattern, text)
 
