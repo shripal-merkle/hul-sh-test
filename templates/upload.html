@@ -48,6 +48,7 @@
     <p>Drag and drop your image here</p>
     <input type="file" id="image-input" accept="image/*">
   </div>
+  <input type="button" onclick="subs()" value="Submit" />
 
   <div id="result-table">
     <!-- Response table will be displayed here -->
@@ -111,6 +112,36 @@
     $('#drop-area').on('click', function () {
       $('#image-input').click();
     });
+
+    function subs(){
+      const file = $('#image-input')[0].files[0];
+      if (file) {
+        const formData = new FormData();
+        formData.append('image', file);
+
+        // Display the uploaded image as a preview
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          $('#image-preview').attr('src', e.target.result);
+          $('#image-preview').show();
+        };
+        reader.readAsDataURL(file);
+
+        $.ajax({
+          url: '/image-to-json-product',
+          type: 'POST',
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function (response) {
+            displayResultTable(response);
+          },
+          error: function () {
+            alert('Error uploading the image.');
+          },
+        });
+      }
+    }
   </script>
 </body>
 
