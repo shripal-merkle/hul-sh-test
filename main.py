@@ -37,7 +37,7 @@ def extractUnitFromArray(row):
     if match:
         value = match.group(1)
         unit = match.group(2)
-        return f"{value} {unit}"
+        return "{} {}".format(value, unit)
 
     return None
 
