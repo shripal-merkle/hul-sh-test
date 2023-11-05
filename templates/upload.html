@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!-- Include jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <style>
+    /* Add some basic styles for the drag-and-drop area */
+    #drop-area {
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    /* Style for the table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    table, th, td {
+      border: 1px solid #ccc;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+
+    /* Style for the image preview */
+    #image-preview {
+      max-width: 100%;
+      max-height: 300px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h2>Upload Image</h2>
+
+  <div id="drop-area">
+    <p>Drag and drop your image here</p>
+    <input type="file" id="image-input" accept="image/*">
+  </div>
+
+  <div id="result-table">
+    <!-- Response table will be displayed here -->
+  </div>
+
+  <img id="image-preview" src="" alt="Image Preview" style="display: none;">
+
+  <script>
+    // Function to display the response as a table and image preview
+    function displayResultTable(response) {
+      let tableHTML = '<table border="1"><tr><th>Product Name</th><th>Quantity</th><th>Unit</th></tr>';
+      response.result.forEach((item) => {
+        tableHTML += `<tr><td>${item.productName}</td><td>${item.quantity}</td><td>${item.unit}</td></tr>`;
+      });
+      tableHTML += `<tr><td colspan="3">${response.detected_text}</td></tr>`;
+      tableHTML += '</table>';
+      $('#result-table').html(tableHTML);
+
+      // Display the uploaded image as a preview
+      
+    }
+
+    // When a file is dropped or selected, handle the upload
+    $('#drop-area').on('drop', function (e) {
+      e.preventDefault();
+      const file = e.originalEvent.dataTransfer.files[0] || $('#image-input')[0].files[0];
+      if (file) {
+        const formData = new FormData();
+        formData.append('image', file);
+
+        // Display the uploaded image as a preview
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          $('#image-preview').attr('src', e.target.result);
+          $('#image-preview').show();
+        };
+        reader.readAsDataURL(file);
+
+        $.ajax({
+          url: '/image-to-json-product',
+          type: 'POST',
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function (response) {
+            displayResultTable(response);
+          },
+          error: function () {
+            alert('Error uploading the image.');
+          },
+        });
+      }
+    });
+
+    // Prevent the default behavior when a file is dropped
+    $('#drop-area').on('dragover', function (e) {
+      e.preventDefault();
+    });
+
+    // Trigger the file input when the drop area is clicked
+    $('#drop-area').on('click', function () {
+      $('#image-input').click();
+    });
+  </script>
+</body>
+
+</html>
